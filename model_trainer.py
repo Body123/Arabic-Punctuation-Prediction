@@ -28,7 +28,7 @@ class ModelTrainer():
         if self.task == 1:    
             self.label_2_id = {"0":0, "1":1}
         else:
-            self.label_2_id = {"0":0, ".":1, ",":2, "?":3, "-":4, ":":5} 
+            self.label_2_id = {"0":0, ".":1, "؛":2, "؟":3, "،":4, ":":5} 
             
         self.id_2_label = list(self.label_2_id.keys())        
     
