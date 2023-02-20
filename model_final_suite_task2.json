@@ -1,3 +1,15 @@
-{
-    "tests": {}
+{   
+    "tests":[   
+        {
+            "id":22,
+            "task":2,
+            "model": "CAMeL-Lab/bert-base-arabic-camelbert-da-sentiment",
+            "languages":["ar"],
+            "augmentation":[""],
+            "data_percentage":1,
+            "use_token_type_ids":false,
+            "tokenizer_config":{"strip_accent":false, "add_prefix_space":true },
+            "opimizer_config":{"adafactor":true, "num_train_epochs":2}
+        }
+    ]
 }
