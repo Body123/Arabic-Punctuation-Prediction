@@ -43,7 +43,7 @@ def load_from_zip(data_zip: str, data_set: str, lang: str, subtask: int = 1):
                 if subtask == 1:
                     labels = [row[subtask] for row in rows]
                 else:
-                    labels = [map_task_two_label(row[subtask]) for row in rows]
+                    labels = [map_task_two_label(row[subtask-1]) for row in rows]
                 if len(words) != len(labels):
                     raise Exception( "word / label missmatch in file " + gt_tsv_file)
                 data.append([words,labels])
