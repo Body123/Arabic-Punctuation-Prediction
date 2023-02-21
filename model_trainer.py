@@ -112,7 +112,7 @@ class ModelTrainer():
         #aug_data += load("data/leipzig_aug_de.zip","aug","de",subtask=task)
         ## tokenize data
             
-        self.tokenizer = AutoTokenizer.from_pretrained("CAMeL-Lab/bert-base-arabic-camelbert-da") # edit here
+        self.tokenizer = AutoTokenizer.from_pretrained(self.model_checkpoint,**self.tokenizer_config) # edit here
 
         #train_data = train_data[:int(len(train_data)*data_factor)] # limit data to x%
         #aug_data = aug_data[:int(len(aug_data)*data_factor)] # limit data to x%
@@ -166,7 +166,7 @@ class ModelTrainer():
         data_collator = DataCollatorForTokenClassification(self.tokenizer)
 
         def model_init():
-            return AutoModel.from_pretrained(self.model_checkpoint, num_labels=len(self.label_2_id))
+            return AutoModelForTokenClassification.from_pretrained(self.model_checkpoint, num_labels=len(self.label_2_id))
 
         trainer = Trainer(
             model_init=model_init,
