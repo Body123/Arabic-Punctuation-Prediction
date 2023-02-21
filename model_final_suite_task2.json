@@ -3,7 +3,7 @@
         {
             "id":22,
             "task":2,
-            "model": "CAMeL-Lab/bert-base-arabic-camelbert-da-sentiment",
+            "model": "xlm-roberta-large",
             "languages":["ar"],
             "augmentation":[""],
             "data_percentage":1,

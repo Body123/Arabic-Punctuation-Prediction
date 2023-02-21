@@ -17,7 +17,7 @@ class ModelTrainer():
         self.task = task 
         self.model_checkpoint = model
         self.run_name = run_name
-        self.batch_size = 8
+        self.batch_size = 2
         self.label_all_tokens = True
         self.data_factor = data_percentage # train and test on x percent of the data
         self.opimizer_config = opimizer_config
