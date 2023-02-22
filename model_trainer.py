@@ -154,7 +154,7 @@ class ModelTrainer():
             warmup_steps=50,
             #lr_scheduler_type="cosine",
             report_to=["tensorboard"],
-            logging_dir='runs/'+self.run_name,            # directory for storing logs
+            logging_dir='/content/drive/MyDrive/punctuation/run/'+self.run_name,            # directory for storing logs
             logging_first_step=True,
             logging_steps=100,
             save_steps=10000,
