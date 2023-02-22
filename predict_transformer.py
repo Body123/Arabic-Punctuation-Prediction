@@ -31,7 +31,7 @@ def predict_sent_end(model: str, data_zip: str, lang: str, data_set: str, outdir
             with io.TextIOWrapper(zf.open(tsv_file), encoding="utf-8") as f:
                 tsv_str = f.read()
             lines = tsv_str.strip().split('\n')
-            print
+            
             rows = [line.split('\t') for line in lines]            
             words = [row[0] for row in rows]            
             
