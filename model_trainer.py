@@ -139,7 +139,7 @@ class ModelTrainer():
 
 
         args = TrainingArguments(
-            output_dir=f"models/{self.run_name}/checkpoints",
+            output_dir=f"/content/drive/MyDrive/punctuation/models/{self.run_name}/checkpoints",
             run_name=self.run_name,    
             evaluation_strategy = "epoch",
             learning_rate=4e-5,
@@ -183,7 +183,7 @@ class ModelTrainer():
             return self.run_hyperparameter_search(trainer)
         else:
             trainer.train()
-            trainer.save_model(f"models/{self.run_name}/final")
+            trainer.save_model(f"/content/drive/MyDrive/punctuation/models/{self.run_name}/final")
             return trainer.state.log_history
 
     def run_hyperparameter_search(self, trainer):
