@@ -18,23 +18,25 @@ def predict_sent_end(model: str, data_zip: str, lang: str, data_set: str, outdir
 
     with ZipFile(data_zip, 'r') as zf:
         fnames = zf.namelist()
-        relevant_dir = os.path.join('sepp_nlg_2021_data', lang, data_set)
+        relevant_dir = os.path.join('sepp_nlg_2021_train_dev_data_v5', lang, data_set)
         tsv_files = [
             fname for fname in fnames
             if fname.startswith(relevant_dir) and fname.endswith('.tsv')
         ]
-
-        for i, tsv_file in enumerate(tqdm(tsv_files), 1):
+        
+        for i, tsv_file in enumerate(tsv_files, 0):
             if not overwrite and Path(os.path.join(outdir, os.path.basename(tsv_file))).exists():
                 continue
 
             with io.TextIOWrapper(zf.open(tsv_file), encoding="utf-8") as f:
                 tsv_str = f.read()
             lines = tsv_str.strip().split('\n')
+            print
             rows = [line.split('\t') for line in lines]            
             words = [row[0] for row in rows]            
             
             lines = predict(pipe,words,task)
+            print(lines[:100])
             with open(os.path.join(outdir, os.path.basename(tsv_file)), 'w',
                       encoding='utf8') as f:
                 f.writelines(lines)        
