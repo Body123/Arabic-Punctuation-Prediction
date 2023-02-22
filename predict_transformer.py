@@ -44,7 +44,7 @@ def overlap_chunks(lst, n, stride=0):
     for i in range(0, len(lst), n-stride):
             yield lst[i:i + n]
 
-label_2_id = {"0":0, ".":1, ",":2, "?":3, "-":4, ":":5}
+label_2_id = {"0":0, ".":1, "؛":2, "؟":3, "،":4, ":":5}
 id_2_label = list(label_2_id.keys())
 
 def map_label_task_2(label):
