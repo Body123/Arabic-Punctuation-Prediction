@@ -118,6 +118,8 @@ class ModelTrainer():
         res.columns = ['Values', 'Count']
 
         print(res)
+        class_weights=(1-(df['values'].value_counts().to_frame()/len(df['values']))).values
+        print(class_weights)
         #todo: implement augmentaion        
         aug_data =[]# load("data/bundestag_aug.zip","aug","de",subtask=task)
         #aug_data += load("data/leipzig_aug_de.zip","aug","de",subtask=task)
