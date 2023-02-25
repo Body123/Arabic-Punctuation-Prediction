@@ -11,7 +11,8 @@ from tqdm import tqdm
 import datetime
 import random
 from tools import print_cm
-
+from torch import nn
+import sys 
 class ModelTrainer():
     def __init__(self, task:int, model:str,run_name:str, data_percentage:float,use_token_type_ids:bool, opimizer_config, tokenizer_config,languages,do_hyperparameter_search = False, **args):
         self.task = task 
