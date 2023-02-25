@@ -121,6 +121,7 @@ class ModelTrainer():
         print(res)
         class_weights=(1-(df['values'].value_counts().to_frame()/len(df['values']))).values
         class_weights=torch.from_numpy(class_weights).float().to("cuda")
+        class_weights=torch.reshape(class_weights, (-1,))
         print(class_weights)
         #todo: implement augmentaion        
         aug_data =[]# load("data/bundestag_aug.zip","aug","de",subtask=task)
