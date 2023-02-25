@@ -20,7 +20,7 @@ class ModelTrainer():
         self.task = task 
         self.model_checkpoint = model
         self.run_name = run_name
-        self.batch_size = 2
+        self.batch_size = 4
         self.label_all_tokens = True
         self.data_factor = data_percentage # train and test on x percent of the data
         self.opimizer_config = opimizer_config
@@ -118,11 +118,11 @@ class ModelTrainer():
         # renaming the columns
         res.columns = ['Values', 'Count']
 
-        print(res)
+        #print(res)
         class_weights=(1-(df['values'].value_counts().to_frame()/len(df['values']))).values
         class_weights=torch.from_numpy(class_weights).float().to("cuda")
         class_weights=torch.reshape(class_weights, (-1,))
-        print(class_weights)
+        #print(class_weights)
         #todo: implement augmentaion        
         aug_data =[]# load("data/bundestag_aug.zip","aug","de",subtask=task)
         #aug_data += load("data/leipzig_aug_de.zip","aug","de",subtask=task)
@@ -183,8 +183,17 @@ class ModelTrainer():
 
         def model_init():
             return AutoModelForTokenClassification.from_pretrained(self.model_checkpoint, num_labels=len(self.label_2_id))
-
-        trainer = Trainer(
+        class CustomTrainer(Trainer):
+          def compute_loss(self, model, inputs, return_outputs=False):
+            labels = inputs.get("labels")
+            # forward pass
+            outputs = model(**inputs)
+            logits = outputs.get("logits")
+            # compute custom loss (suppose one has 3 labels with different weights)
+            loss_fct = nn.CrossEntropyLoss(weight=class_weights)
+            loss = loss_fct(logits.view(-1, self.model.config.num_labels), labels.view(-1))
+            return (loss, outputs) if return_outputs else loss
+        trainer = CustomTrainer(
             model_init=model_init,
             args = args,    
             train_dataset=tokenized_dataset_train,
