@@ -12,6 +12,7 @@ import datetime
 import random
 from tools import print_cm
 from torch import nn
+import pandas as pd
 import sys 
 class ModelTrainer():
     def __init__(self, task:int, model:str,run_name:str, data_percentage:float,use_token_type_ids:bool, opimizer_config, tokenizer_config,languages,do_hyperparameter_search = False, **args):
@@ -107,7 +108,16 @@ class ModelTrainer():
         for language in self.languages:
             val_data += load("data/sepp_nlg_2021_train_dev_data_v5.zip","dev",language,subtask=self.task)
             train_data += load("data/sepp_nlg_2021_train_dev_data_v5.zip","train",language,subtask=self.task)
+        
+        l=train_data[0][1]
+        df = pd.DataFrame(l, columns=['values'])
 
+        res = df['values'].value_counts(normalize=True).to_frame().reset_index().sort_values('index')
+
+        # renaming the columns
+        res.columns = ['Values', 'Count']
+
+        print(res)
         #todo: implement augmentaion        
         aug_data =[]# load("data/bundestag_aug.zip","aug","de",subtask=task)
         #aug_data += load("data/leipzig_aug_de.zip","aug","de",subtask=task)
