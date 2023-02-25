@@ -12,6 +12,7 @@ import datetime
 import random
 from tools import print_cm
 from torch import nn
+import torch
 import pandas as pd
 import sys 
 class ModelTrainer():
