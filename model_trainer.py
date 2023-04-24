@@ -15,6 +15,7 @@ from torch import nn
 import torch
 import pandas as pd
 import sys 
+from IPython.display import display
 class ModelTrainer():
     def __init__(self, task:int, model:str,run_name:str, data_percentage:float,use_token_type_ids:bool, opimizer_config, tokenizer_config,languages,do_hyperparameter_search = False, **args):
         self.task = task 
