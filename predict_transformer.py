@@ -8,6 +8,7 @@ from zipfile import ZipFile
 from tqdm import tqdm
 
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support, classification_report, confusion_matrix
+from tools import print_cm
 
 def predict_sent_end(model: str, data_zip: str, lang: str, data_set: str, outdir: str,task:str, overwrite: bool = True) -> None:
     outdir = os.path.join(outdir, lang, data_set)
@@ -37,8 +38,13 @@ def predict_sent_end(model: str, data_zip: str, lang: str, data_set: str, outdir
             words = [row[0] for row in rows]            
             ground_truth = [row[1] for row in rows]
             pred,lines = predict(pipe,words,task)
+            print("\n----- report -----\n")
             report = classification_report(ground_truth, pred,target_names=label_2_id.keys())
             print(report)
+            print("\n----- confusion matrix -----\n")
+            cm = confusion_matrix(labels,preds,normalize="true")
+            print_cm(cm,self.id_2_label)
+            
             #print(lines[:100])
             with open(os.path.join(outdir, os.path.basename(tsv_file)), 'w',
                       encoding='utf8') as f:
