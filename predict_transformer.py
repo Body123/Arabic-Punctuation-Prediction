@@ -7,6 +7,7 @@ from pathlib import Path
 from zipfile import ZipFile
 from tqdm import tqdm
 
+from sklearn.metrics import accuracy_score, precision_recall_fscore_support, classification_report, confusion_matrix
 
 def predict_sent_end(model: str, data_zip: str, lang: str, data_set: str, outdir: str,task:str, overwrite: bool = True) -> None:
     outdir = os.path.join(outdir, lang, data_set)
@@ -34,9 +35,11 @@ def predict_sent_end(model: str, data_zip: str, lang: str, data_set: str, outdir
             
             rows = [line.split('\t') for line in lines]            
             words = [row[0] for row in rows]            
-            
-            lines = predict(pipe,words,task)
-            print(lines[:100])
+            ground_truth = [row[1] for row in rows]
+            pred,lines = predict(pipe,words,task)
+            report = classification_report(ground_truth, pred,target_names=label_2_id.keys())
+            print(report)
+            #print(lines[:100])
             with open(os.path.join(outdir, os.path.basename(tsv_file)), 'w',
                       encoding='utf8') as f:
                 f.writelines(lines)        
@@ -74,7 +77,8 @@ def predict(pipe,words, task):
     if len(batches[-1]) <= overlap:
         batches.pop()
 
-    tagged_words = []     
+    tagged_words = []   
+    predctions = []  
     for batch in tqdm(batches):
         # use last batch completly
         if batch == batches[-1]: 
@@ -104,6 +108,7 @@ def predict(pipe,words, task):
             if task == "1":
                 tagged_words += [f"{word}\t{label}\n"]
             if task == "2":
+                predctions+= [f"{label}"]
                 tagged_words += [f"{word}\t-\t{label}\n"]
     
     if len(tagged_words) == len(words):
@@ -112,7 +117,7 @@ def predict(pipe,words, task):
             if x[0].startswith(x[1]) == False:                
                 print(i,x)
     assert len(tagged_words) == len(words)
-    return tagged_words
+    return predctions,tagged_words
 
 if __name__ == '__main__':    
     import argparse
