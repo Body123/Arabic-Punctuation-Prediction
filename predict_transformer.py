@@ -43,7 +43,8 @@ def predict_sent_end(model: str, data_zip: str, lang: str, data_set: str, outdir
             print(report)
             print("\n----- confusion matrix -----\n")
             cm = confusion_matrix(labels,preds,normalize="true")
-            print_cm(cm,self.id_2_label)
+            id_2_label = list(label_2_id.keys()) 
+            print_cm(cm,id_2_label)
             
             #print(lines[:100])
             with open(os.path.join(outdir, os.path.basename(tsv_file)), 'w',
