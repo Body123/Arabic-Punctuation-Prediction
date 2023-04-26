@@ -42,7 +42,7 @@ def predict_sent_end(model: str, data_zip: str, lang: str, data_set: str, outdir
             report = classification_report(ground_truth, pred,target_names=label_2_id.keys())
             print(report)
             print("\n----- confusion matrix -----\n")
-            cm = confusion_matrix(labels,preds,normalize="true")
+            cm = confusion_matrix(ground_truth,pred,normalize="true")
             id_2_label = list(label_2_id.keys()) 
             print_cm(cm,id_2_label)
             
