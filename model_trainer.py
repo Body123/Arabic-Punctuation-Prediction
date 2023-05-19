@@ -131,7 +131,7 @@ class ModelTrainer():
             
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_checkpoint,**self.tokenizer_config) # edit here
 
-        #train_data = train_data[:int(len(train_data)*data_factor)] # limit data to x%
+        #train_data = train_data[:int(lfen(train_data)*data_factor)] # limit data to x%
         #aug_data = aug_data[:int(len(aug_data)*data_factor)] # limit data to x%
         print("tokenize training data")
         tokenized_dataset_train = self.to_dataset(train_data,stride=100)
@@ -156,7 +156,7 @@ class ModelTrainer():
 
 
         args = TrainingArguments(
-            output_dir=f"/content/drive/MyDrive/punctuation/models/{self.run_name}/checkpoints",
+            output_dir=f"/content/drive/MyDrive/tashkeela_v2/models/{self.run_name}/checkpoints",
             run_name=self.run_name,    
             evaluation_strategy = "epoch",
             learning_rate=4e-5,
@@ -171,13 +171,14 @@ class ModelTrainer():
             warmup_steps=50,
             #lr_scheduler_type="cosine",
             report_to=["tensorboard"],
-            logging_dir='/content/drive/MyDrive/punctuation/run/'+self.run_name,            # directory for storing logs
+            logging_dir='/content/drive/MyDrive/tashkeela_v2/run/'+self.run_name,            # directory for storing logs
             logging_first_step=True,
             logging_steps=100,
             save_steps=10000,
             save_total_limit=10,
             seed=16, 
             fp16=True   
+            resume_from_checkpoint="fullstop-deep-punctuation-prediction/models/xlm-roberta-large-ar-1-task2/checkpoints/checkpoint-700000"
         )
 
         data_collator = DataCollatorForTokenClassification(self.tokenizer)
@@ -208,7 +209,7 @@ class ModelTrainer():
             print("----------hyper param search------------")
             return self.run_hyperparameter_search(trainer)
         else:
-            trainer.train()
+            trainer.train(resume_from_checkpoint=True)
             trainer.save_model(f"/content/drive/MyDrive/punctuation/models/{self.run_name}/final")
             return trainer.state.log_history
 
