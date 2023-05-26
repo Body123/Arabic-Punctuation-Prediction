@@ -8,7 +8,23 @@ from zipfile import ZipFile
 from tqdm import tqdm
 
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support, classification_report, confusion_matrix
+
+import numpy as np
+from sklearn.metrics import confusion_matrix
+import seaborn as sns
 from tools import print_cm
+import matplotlib.pyplot as plt
+from sklearn import metrics
+from sklearn.metrics import confusion_matrix
+import pandas as pd
+import seaborn as sns; sns.set()
+
+
+label_2_id = {"0":0, ".":1, "؛":2, "؟":3, "،":4, ":":5}
+id_2_label = list(label_2_id.keys()) 
+# id_2_label = [".","0",":","،","؛","؟"]
+
+
 
 def predict_sent_end(model: str, data_zip: str, lang: str, data_set: str, outdir: str,task:str, overwrite: bool = True) -> None:
     outdir = os.path.join(outdir, lang, data_set)
@@ -39,13 +55,35 @@ def predict_sent_end(model: str, data_zip: str, lang: str, data_set: str, outdir
             ground_truth = [row[1] for row in rows]
             pred,lines = predict(pipe,words,task)
             print("\n----- report -----\n")
-            report = classification_report(ground_truth, pred,target_names=label_2_id.keys())
+            report = classification_report(ground_truth, pred)
             print(report)
             print("\n----- confusion matrix -----\n")
-            cm = confusion_matrix(ground_truth,pred,normalize="true")
-            id_2_label = list(label_2_id.keys()) 
-            print_cm(cm,id_2_label)
+            # cm = confusion_matrix(ground_truth, pred)
+            # cm_display = metrics.ConfusionMatrixDisplay(confusion_matrix = cm, display_labels = id_2_label)
+            # cm_display.plot()
+            # plt.savefig('foo.png')
+            # plt.show()
+            cm = confusion_matrix(ground_truth, pred,labels=id_2_label)
+            cmat_df = pd.DataFrame(cm, index=id_2_label, columns=id_2_label)
+            print(cmat_df)
+            ax = sns.heatmap(cmat_df, square=True, annot=True, cbar=False)
+            ax.set_xlabel('Predicción')
+            ax.set_ylabel('Real')
+            fig = ax.get_figure()
+            fig.savefig("out.png") 
             
+            
+            
+            cm = confusion_matrix(ground_truth, pred,labels=id_2_label)
+            cmn = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+            fig, ax = plt.subplots(figsize=(7,7))
+            sns.heatmap(cmn, annot=True, fmt='.3f', xticklabels=id_2_label, yticklabels=id_2_label)
+            plt.ylabel('Actual')
+            plt.xlabel('ed')
+            plt.savefig('confusion_sakr.png')
+            plt.show()
+            # cm = confusion_matrix(ground_truth, pred, normalize="true")
+            # print_cm(cm, id_2_label)            
             #print(lines[:100])
             with open(os.path.join(outdir, os.path.basename(tsv_file)), 'w',
                       encoding='utf8') as f:
@@ -56,8 +94,7 @@ def overlap_chunks(lst, n, stride=0):
     for i in range(0, len(lst), n-stride):
             yield lst[i:i + n]
 
-label_2_id = {"0":0, ".":1, "؛":2, "؟":3, "،":4, ":":5}
-id_2_label = list(label_2_id.keys())
+
 
 def map_label_task_2(label):
     label_id = int(label[-1])
@@ -73,7 +110,7 @@ def map_label_task_1(label):
 
 def predict(pipe,words, task):
     overlap = 5
-    chunk_size = 230
+    chunk_size = 180 #230
     if len(words) <= chunk_size:
         overlap = 0
 
@@ -114,7 +151,9 @@ def predict(pipe,words, task):
             #    label = 1
             if task == "1":
                 tagged_words += [f"{word}\t{label}\n"]
-            if task == "2":
+            if task == "2":################ edit here #######
+                if (label=="؛" or label==':'):
+                    label="0"
                 predctions+= [f"{label}"]
                 tagged_words += [f"{word}\t-\t{label}\n"]
     
