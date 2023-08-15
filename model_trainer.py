@@ -184,11 +184,10 @@ class ModelTrainer():
             save_total_limit=20,
             seed=16, 
             fp16=True,
-            resume_from_checkpoint="/home/cairo/ejada/developers/sakr/fullstop-deep-punctuation-prediction/models/-home-cairo-ejada-developers-sakr-fullstop-deep-punctuation-prediction-models-xlm-roberta-large-ar-1-task2-checkpoints-checkpoint-60000-ar-1-task2/checkpoints/checkpoint-20000"
+            resume_from_checkpoint="/fullstop-deep-punctuation-prediction/models/-home-cairo-ejada-developers-sakr-fullstop-deep-punctuation-prediction-models-xlm-roberta-large-ar-1-task2-checkpoints-checkpoint-60000-ar-1-task2/checkpoints/checkpoint-20000"
         )
         
         
-        print(self.tokenizer)
         data_collator = DataCollatorForTokenClassification(self.tokenizer)
         def model_init():
             return AutoModelForTokenClassification.from_pretrained(self.model_checkpoint, num_labels=len(self.label_2_id),ignore_mismatched_sizes=True)
@@ -216,7 +215,6 @@ class ModelTrainer():
             print("----------hyper param search------------")
             return self.run_hyperparameter_search(trainer)
         else:
-            print("^"*100)
             trainer.train(resume_from_checkpoint=True) #resume_from_checkpoint=True
             trainer.save_model(f"models/{self.run_name}/final")
             return trainer.state.log_history
