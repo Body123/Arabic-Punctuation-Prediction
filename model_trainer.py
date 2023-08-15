@@ -21,7 +21,7 @@ class ModelTrainer():
         self.task = task 
         self.model_checkpoint = model
         self.run_name = run_name
-        self.batch_size = 4
+        self.batch_size = 8
         self.label_all_tokens = True
         self.data_factor = data_percentage # train and test on x percent of the data
         self.opimizer_config = opimizer_config
@@ -32,7 +32,8 @@ class ModelTrainer():
         if self.task == 1:    
             self.label_2_id = {"0":0, "1":1}
         else:
-            self.label_2_id = {"0":0, ".":1, "؛":2, "؟":3, "،":4, ":":5} 
+            self.label_2_id = {"0":0, ".":1, "؛":2, "؟":3, "،":4, ":":5} # use this araPunc related Tasks
+            #self.label_2_id = {"0":0, ".":1, "؟":2, "،":3}  # use this QASR related Tasks
             
         self.id_2_label = list(self.label_2_id.keys())        
     
@@ -43,7 +44,7 @@ class ModelTrainer():
             
         tokenizer_settings = {'is_split_into_words':True,'return_offsets_mapping':True, 
                                 'padding':False, 'truncation':True, 'stride':stride, 
-                                'max_length':self.tokenizer.model_max_length, 'return_overflowing_tokens':True}
+                                'max_length':512, 'return_overflowing_tokens':True}
         tokenized_inputs = self.tokenizer(data[0], **tokenizer_settings)
 
         labels = []
@@ -54,14 +55,13 @@ class ModelTrainer():
                 if word_id == None: #or last_word_id == word_id:
                     doc_encoded_labels.append(-100)        
                 else:
-                    #document_id = tokenized_inputs.overflow_to_sample_mapping[i]
-                    #label = examples[task][document_id][word_id]
                     label = data[1][word_id]
                     doc_encoded_labels.append(self.label_2_id[label])
                 last_word_id = word_id
             labels.append(doc_encoded_labels)
         
-        tokenized_inputs["labels"] = labels    
+        tokenized_inputs["labels"] = labels  
+ 
         return tokenized_inputs
 
     def to_dataset(self,data,stride=0):
@@ -88,11 +88,13 @@ class ModelTrainer():
             else:
                 precision, recall, f1, _ = precision_recall_fscore_support(labels, preds, average="macro")  
                 print("\n----- report -----\n")
-                report = classification_report(labels, preds,target_names=self.label_2_id.keys())
+                report = classification_report(labels, preds,target_names=self.label_2_id.keys(), digits=4)
                 print(report)
                 print("\n----- confusion matrix -----\n")
                 cm = confusion_matrix(labels,preds,normalize="true")
                 print_cm(cm,self.id_2_label)
+                
+
 
             acc = accuracy_score(labels, preds)    
             return {     
@@ -108,30 +110,33 @@ class ModelTrainer():
         train_data = []
 
         for language in self.languages:
-            val_data += load("data/sepp_nlg_2021_train_dev_data_v5.zip","dev",language,subtask=self.task)
-            train_data += load("data/sepp_nlg_2021_train_dev_data_v5.zip","train",language,subtask=self.task)
-        
+            val_data += load("data-imp/sepp_nlg_2021_train_dev_data_v5.zip","dev",language,subtask=self.task)
+            train_data += load("data-imp/sepp_nlg_2021_train_dev_data_v5.zip","train",language,subtask=self.task)
+        ll=train_data[0][0]
         l=train_data[0][1]
+
         df = pd.DataFrame(l, columns=['values'])
-
-        res = df['values'].value_counts(normalize=True).to_frame().reset_index().sort_values('index')
-
+        
+        res = df['values'].value_counts(normalize=True).to_frame().reset_index().sort_values('values')
+        
         # renaming the columns
         res.columns = ['Values', 'Count']
+        res2 = df['values'].value_counts().to_frame().reset_index().sort_values('values')
+        res2.columns = ['Values', 'Count']
 
-        #print(res)
+        df3 = pd.DataFrame(ll, columns=['values'])
+        res3 = df3['values'].value_counts().to_frame().reset_index().sort_values('values')
+        res3.columns = ['Values', 'Count']
         class_weights=(1-(df['values'].value_counts().to_frame()/len(df['values']))).values
-        class_weights=torch.from_numpy(class_weights).float().to("cuda")
+        class_weights=torch.from_numpy(class_weights).float()
+        class_weights=class_weights.to("cuda")
         class_weights=torch.reshape(class_weights, (-1,))
-        #print(class_weights)
         #todo: implement augmentaion        
         aug_data =[]# load("data/bundestag_aug.zip","aug","de",subtask=task)
         #aug_data += load("data/leipzig_aug_de.zip","aug","de",subtask=task)
         ## tokenize data
-            
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_checkpoint,**self.tokenizer_config) # edit here
-
-        #train_data = train_data[:int(lfen(train_data)*data_factor)] # limit data to x%
+        #train_data = train_data[:int(len(train_data)*data_factor)] # limit data to x%
         #aug_data = aug_data[:int(len(aug_data)*data_factor)] # limit data to x%
         print("tokenize training data")
         tokenized_dataset_train = self.to_dataset(train_data,stride=100)
@@ -139,6 +144,7 @@ class ModelTrainer():
         #tokenized_dataset_aug = to_dataset(aug_data,stride=100)
         #del aug_data
         if self.data_factor < 1.0:
+            print("Enter data.factor<1.")
             train_split = tokenized_dataset_train.train_test_split(train_size=self.data_factor)
             tokenized_dataset_train = train_split["train"]
             #aug_split = tokenized_dataset_aug.train_test_split(train_size=data_factor)
@@ -154,9 +160,9 @@ class ModelTrainer():
 
         ## train model
 
-
+        print(f"models/{self.run_name}/checkpoints")
         args = TrainingArguments(
-            output_dir=f"/content/drive/MyDrive/tashkeela_v2/models/{self.run_name}/checkpoints",
+            output_dir=f"models/{self.run_name}/checkpoints",
             run_name=self.run_name,    
             evaluation_strategy = "epoch",
             learning_rate=4e-5,
@@ -171,20 +177,21 @@ class ModelTrainer():
             warmup_steps=50,
             #lr_scheduler_type="cosine",
             report_to=["tensorboard"],
-            logging_dir='/content/drive/MyDrive/tashkeela_v2/run/'+self.run_name,            # directory for storing logs
+            logging_dir='run/'+self.run_name,            # directory for storing logs
             logging_first_step=True,
-            logging_steps=100,
-            save_steps=10000,
-            save_total_limit=10,
+            logging_steps=500,
+            save_steps=20000,
+            save_total_limit=20,
             seed=16, 
-            fp16=True   
-            resume_from_checkpoint="fullstop-deep-punctuation-prediction/models/xlm-roberta-large-ar-1-task2/checkpoints/checkpoint-700000"
+            fp16=True,
+            resume_from_checkpoint="/home/cairo/ejada/developers/sakr/fullstop-deep-punctuation-prediction/models/-home-cairo-ejada-developers-sakr-fullstop-deep-punctuation-prediction-models-xlm-roberta-large-ar-1-task2-checkpoints-checkpoint-60000-ar-1-task2/checkpoints/checkpoint-20000"
         )
-
+        
+        
+        print(self.tokenizer)
         data_collator = DataCollatorForTokenClassification(self.tokenizer)
-
         def model_init():
-            return AutoModelForTokenClassification.from_pretrained(self.model_checkpoint, num_labels=len(self.label_2_id))
+            return AutoModelForTokenClassification.from_pretrained(self.model_checkpoint, num_labels=len(self.label_2_id),ignore_mismatched_sizes=True)
         class CustomTrainer(Trainer):
           def compute_loss(self, model, inputs, return_outputs=False):
             labels = inputs.get("labels")
@@ -195,7 +202,7 @@ class ModelTrainer():
             loss_fct = nn.CrossEntropyLoss(weight=class_weights)
             loss = loss_fct(logits.view(-1, self.model.config.num_labels), labels.view(-1))
             return (loss, outputs) if return_outputs else loss
-        trainer = CustomTrainer(
+        trainer = Trainer(
             model_init=model_init,
             args = args,    
             train_dataset=tokenized_dataset_train,
@@ -204,13 +211,14 @@ class ModelTrainer():
             tokenizer=self.tokenizer,
             compute_metrics=self.compute_metrics_generator()
         )
-
+        
         if self.do_hyperparameter_search:
             print("----------hyper param search------------")
             return self.run_hyperparameter_search(trainer)
         else:
-            trainer.train(resume_from_checkpoint=True)
-            trainer.save_model(f"/content/drive/MyDrive/punctuation/models/{self.run_name}/final")
+            print("^"*100)
+            trainer.train(resume_from_checkpoint=True) #resume_from_checkpoint=True
+            trainer.save_model(f"models/{self.run_name}/final")
             return trainer.state.log_history
 
     def run_hyperparameter_search(self, trainer):
@@ -239,6 +247,6 @@ class ModelTrainer():
 
 if __name__ =="__main__":
     trainer = ModelTrainer(task=2,model="dbmdz/bert-base-italian-xxl-uncased",run_name="optim",data_percentage=0.1,use_token_type_ids=True, opimizer_config={"adafactor": False,"num_train_epochs": 3},tokenizer_config={"strip_accent": True, "add_prefix_space":False},languages=["it"], do_hyperparameter_search=True)
-    result = trainer.run_training()
+    result = trainer.run_training(resume_from_checkpoint=True)#resume_from_checkpoint=True
 
     print(result)
