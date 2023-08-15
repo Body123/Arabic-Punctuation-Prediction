@@ -6,8 +6,8 @@ from tqdm import tqdm
 import pickle
 import random
 
-def map_task_two_label(label):
-    if  label not in [':', '؟', '؛', '،', '.']: #label != "0" and label != "." and label != "," and label != "?" and label != "!" and label != ";" and :
+def map_task_two_label(label): #[ '؟', '،', '.'] # QASR realted Task
+    if  label not in [':', '؟', '؛', '،', '.'] : #label != "0" and label != "." and label != "," and label != "?" and label != "!" and label != ";" and :
         return "0"
     return label
 
