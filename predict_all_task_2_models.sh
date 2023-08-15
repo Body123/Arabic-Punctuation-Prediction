@@ -6,4 +6,7 @@
 
 
 
-python predict_transformer.py data/sepp_nlg_2021_train_dev_data_v5.zip ar test data/predictions-final-multilang-task2 "/content/drive/MyDrive/punctuation/models/xlm-roberta-large-ar-1-task2/final" 2
+python predict_transformer.py data/sepp_nlg_2021_train_dev_data_v5.zip ar test data/predictions-final-multilang-task2 "/fullstop-deep-punctuation-prediction/models/models-xlm-roberta-large-ar-1-task2-without-checkpoints-checkpoint-330000-ar-1-task2-without/checkpoints/checkpoint-40000" 2
+
+
+
