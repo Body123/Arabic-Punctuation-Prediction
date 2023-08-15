@@ -20,9 +20,9 @@ import pandas as pd
 import seaborn as sns; sns.set()
 
 
-label_2_id = {"0":0, ".":1, "؛":2, "؟":3, "،":4, ":":5}
+#label_2_id = {"0":0, ".":1, "؛":2, "؟":3, "،":4, ":":5}
+label_2_id = {"0":0, ".":1, "؟":2, "،":3}
 id_2_label = list(label_2_id.keys()) 
-# id_2_label = [".","0",":","،","؛","؟"]
 
 
 
@@ -55,19 +55,14 @@ def predict_sent_end(model: str, data_zip: str, lang: str, data_set: str, outdir
             ground_truth = [row[1] for row in rows]
             pred,lines = predict(pipe,words,task)
             print("\n----- report -----\n")
-            report = classification_report(ground_truth, pred)
+            report = classification_report(ground_truth, pred, digits=4)
             print(report)
             print("\n----- confusion matrix -----\n")
-            # cm = confusion_matrix(ground_truth, pred)
-            # cm_display = metrics.ConfusionMatrixDisplay(confusion_matrix = cm, display_labels = id_2_label)
-            # cm_display.plot()
-            # plt.savefig('foo.png')
-            # plt.show()
             cm = confusion_matrix(ground_truth, pred,labels=id_2_label)
             cmat_df = pd.DataFrame(cm, index=id_2_label, columns=id_2_label)
             print(cmat_df)
             ax = sns.heatmap(cmat_df, square=True, annot=True, cbar=False)
-            ax.set_xlabel('Predicción')
+            ax.set_xlabel('Prediction')
             ax.set_ylabel('Real')
             fig = ax.get_figure()
             fig.savefig("out.png") 
@@ -79,12 +74,9 @@ def predict_sent_end(model: str, data_zip: str, lang: str, data_set: str, outdir
             fig, ax = plt.subplots(figsize=(7,7))
             sns.heatmap(cmn, annot=True, fmt='.3f', xticklabels=id_2_label, yticklabels=id_2_label)
             plt.ylabel('Actual')
-            plt.xlabel('ed')
+            plt.xlabel('prediction')
             plt.savefig('confusion_sakr.png')
             plt.show()
-            # cm = confusion_matrix(ground_truth, pred, normalize="true")
-            # print_cm(cm, id_2_label)            
-            #print(lines[:100])
             with open(os.path.join(outdir, os.path.basename(tsv_file)), 'w',
                       encoding='utf8') as f:
                 f.writelines(lines)        
@@ -110,7 +102,7 @@ def map_label_task_1(label):
 
 def predict(pipe,words, task):
     overlap = 5
-    chunk_size = 180 #230
+    chunk_size = 200 #230
     if len(words) <= chunk_size:
         overlap = 0
 
@@ -152,8 +144,6 @@ def predict(pipe,words, task):
             if task == "1":
                 tagged_words += [f"{word}\t{label}\n"]
             if task == "2":################ edit here #######
-                if (label=="؛" or label==':'):
-                    label="0"
                 predctions+= [f"{label}"]
                 tagged_words += [f"{word}\t-\t{label}\n"]
     
