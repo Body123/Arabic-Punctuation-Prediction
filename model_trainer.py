@@ -183,8 +183,7 @@ class ModelTrainer():
             save_steps=20000,
             save_total_limit=20,
             seed=16, 
-            fp16=True,
-            resume_from_checkpoint="/fullstop-deep-punctuation-prediction/models/-home-cairo-ejada-developers-sakr-fullstop-deep-punctuation-prediction-models-xlm-roberta-large-ar-1-task2-checkpoints-checkpoint-60000-ar-1-task2/checkpoints/checkpoint-20000"
+            fp16=True
         )
         
         
