@@ -110,8 +110,8 @@ class ModelTrainer():
         train_data = []
 
         for language in self.languages:
-            val_data += load("data-imp/sepp_nlg_2021_train_dev_data_v5.zip","dev",language,subtask=self.task)
-            train_data += load("data-imp/sepp_nlg_2021_train_dev_data_v5.zip","train",language,subtask=self.task)
+            val_data += load("data/compressed_data.zip","dev",language,subtask=self.task)
+            train_data += load("data/compressed_data.zip","train",language,subtask=self.task)
         ll=train_data[0][0]
         l=train_data[0][1]
 

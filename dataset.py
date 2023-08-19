@@ -19,7 +19,7 @@ def load_from_zip(data_zip: str, data_set: str, lang: str, subtask: int = 1):
     if data_set == "aug":
         relevant_dir = "" # all files are relevant..
     else:
-        relevant_dir = os.path.join('sepp_nlg_2021_train_dev_data_v5', lang, data_set)        
+        relevant_dir = os.path.join('data_decompressed', lang, data_set)        
         relevant_dir = re.sub(r'\\', '/', relevant_dir)
 
     all_gt_labels, all_predicted_labels = list(), list()  # aggregate all labels over all files
