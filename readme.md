@@ -3,7 +3,19 @@ it is based on the pre-processing of
 the Tashkeela “Arabic diacritization corpus”. We keep six classes:
 space ‘0’, full-stop ‘.’, comma ‘,’, the colon‘:’, semicolon ‘;’, and
 the question mark ‘?’.
+
+In the following table, you can find the distribution of punctuation classes in AraPunc dataset:
+| Label         | Train    | Dev    | Test    |
+| ------------- | ----- | ----- | ----- |
+| ,             | 1756058 | 309118 | 514741 | 
+| .              | 638133 | 112409 | 187367 | 
+| ?              | 51798 | 9193| 15448 | 
+| 0              | 33639104 |  5923672| 9888211 | 
+| :             | 939876 | 165549 | 275918 | 
+| ;              | 233479 |40846 | 67756 |
 You can download the dataset from [HERE](https://drive.google.com/file/d/1sLYWGKawmNIjvfBESro4Z2qK1A3PdCxn/view?usp=sharing)
+
+
 # FullStop: Multilingual Deep Models for Punctuation Prediction
 
 This work describes our contribution to the SEPP-NLG Shared Task in multilingual sentence segmentation and punctuation prediction.
