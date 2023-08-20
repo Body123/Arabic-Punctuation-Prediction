@@ -1,3 +1,9 @@
+# AraPunc dataset: 
+it is based on the pre-processing of
+the Tashkeela “Arabic diacritization corpus”. We keep six classes:
+space ‘0’, full-stop ‘.’, comma ‘,’, the colon‘:’, semicolon ‘;’, and
+the question mark ‘?’.
+You can download the dataset from [HERE](https://drive.google.com/file/d/1sLYWGKawmNIjvfBESro4Z2qK1A3PdCxn/view?usp=sharing)
 # FullStop: Multilingual Deep Models for Punctuation Prediction
 
 This work describes our contribution to the SEPP-NLG Shared Task in multilingual sentence segmentation and punctuation prediction.
