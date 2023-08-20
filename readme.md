@@ -18,7 +18,7 @@ In the following table, you can find the distribution of punctuation classes in 
 You can download the dataset from [HERE](https://drive.google.com/file/d/1sLYWGKawmNIjvfBESro4Z2qK1A3PdCxn/view?usp=sharing)
 
 
-# FullStop: Multilingual Deep Models for Punctuation Prediction
+<!--# FullStop: Multilingual Deep Models for Punctuation Prediction
 
 This work describes our contribution to the SEPP-NLG Shared Task in multilingual sentence segmentation and punctuation prediction.
 The goal of this task consists in training NLP models that can predict the end of sentence (EOS) and punctuation marks on automatically
@@ -150,6 +150,7 @@ https://drive.switch.ch/index.php/s/g3fMhMZU2uo32mf
   url       = {http://ceur-ws.org/Vol-2957/sepp_paper4.pdf}
 }
 ```
+h-->
 
 
 
